@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("api/v1/categories")
 public class CategoryController {
 
     @GetMapping("")
