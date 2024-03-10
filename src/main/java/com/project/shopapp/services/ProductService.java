@@ -10,28 +10,27 @@ import com.project.shopapp.models.ProductImage;
 import com.project.shopapp.repositories.CategoryRepository;
 import com.project.shopapp.repositories.ProductImageRepository;
 import com.project.shopapp.repositories.ProductRepository;
+import com.project.shopapp.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ProductService implements IProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
     private final ProductImageRepository productImageRepository;
     @Override
-    public Product createProduct(ProductDTO productDTO) throws Exception {
+    public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
         Category existingCategory = categoryRepository
                 .findById(productDTO.getCategoryId())
                 .orElseThrow(() ->
                         new DataNotFoundException(
-                                "Cannot find category with id: "+ productDTO.getCategoryId()));
+                                "Cannot find category with id: "+productDTO.getCategoryId()));
 
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
@@ -45,18 +44,25 @@ public class ProductService implements IProductService{
 
     @Override
     public Product getProductById(long productId) throws Exception {
-
-        return productRepository.findById(productId).orElseThrow(
-                () -> new DataNotFoundException("Can not find product id: "  + productId));
+        return productRepository.findById(productId).
+                orElseThrow(()-> new DataNotFoundException(
+                        "Cannot find product with id ="+productId));
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest);
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
+        // Lấy danh sách sản phẩm theo trang(page) và giới hạn(limit)
+        return productRepository
+                .findAll(pageRequest)
+                .map(ProductResponse::fromProduct);
     }
 
     @Override
-    public Product updateProduct(long id, ProductDTO productDTO) throws Exception {
+    public Product updateProduct(
+            long id,
+            ProductDTO productDTO
+    )
+            throws Exception {
         Product existingProduct = getProductById(id);
         if(existingProduct != null) {
             //copy các thuộc tính từ DTO -> Product
@@ -74,20 +80,19 @@ public class ProductService implements IProductService{
             return productRepository.save(existingProduct);
         }
         return null;
+
     }
 
     @Override
     public void deleteProduct(long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         optionalProduct.ifPresent(productRepository::delete);
-
     }
 
     @Override
     public boolean existsByName(String name) {
         return productRepository.existsByName(name);
     }
-
     @Override
     public ProductImage createProductImage(
             Long productId,
@@ -110,11 +115,4 @@ public class ProductService implements IProductService{
         }
         return productImageRepository.save(newProductImage);
     }
-
-    @Override
-    public List<Product> findProductsByIds(List<Long> productIds) {
-        return productRepository.findProductsByIds(productIds);
-    }
-
-
 }
