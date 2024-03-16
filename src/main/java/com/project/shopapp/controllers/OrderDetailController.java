@@ -65,6 +65,6 @@ public class OrderDetailController {
             @Valid @PathVariable("id") Long id) {
         orderDetailService.deleteById(id);
         return ResponseEntity.ok().body("Delete Order detail with id : "+id+" successfully");
-        //return ResponseEntity.noContent().build();
+
     }
 }
