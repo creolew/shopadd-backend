@@ -6,16 +6,16 @@ import com.project.shopapp.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService implements  ICategoryService{
-
+public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
-
     @Override
+    @Transactional
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category
                 .builder()
@@ -25,10 +25,9 @@ public class CategoryService implements  ICategoryService{
     }
 
     @Override
-    public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(
-                () ->  new RuntimeException("Category Not Found")
-        );
+    public Category getCategoryById(long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
     @Override
@@ -47,7 +46,9 @@ public class CategoryService implements  ICategoryService{
     }
 
     @Override
+    @Transactional
     public void deleteCategory(long id) {
+        //xóa xong
         categoryRepository.deleteById(id);
     }
 }

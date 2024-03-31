@@ -33,6 +33,9 @@ public class OrderDTO {
     @Size(min = 5, message = "Phone number must be at least 5 characters")
     private String phoneNumber;
 
+    @JsonProperty("status")
+    private String status;
+
     private String address;
 
     private String note;
@@ -53,5 +56,7 @@ public class OrderDTO {
     @JsonProperty("payment_method")
     private String paymentMethod;
 
+    @JsonProperty("cart_items")
+    private List<CartItemDTO> cartItems;
 
 }
